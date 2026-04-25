@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>나는 여우일까 곰일까? 🦊🐻</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080808;
+    --red: #e8102e;
+    --gold: #c9a84c;
+    --text: #f0e8df;
+    --muted: #555;
+    --border: #1a1a1a;
+    --card: #0e0e0e;
+    --accent: #f5ece3;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 16px;
+    line-height: 1.9;
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 0 0 80px;
+    min-height: 100vh;
+  }
+
+  /* 상단 */
+  .top-bar {
+    text-align: center;
+    padding: 40px 24px 32px;
+    border-bottom: 1px solid var(--border);
+  }
+  .top-tag {
+    font-size: 10px;
+    letter-spacing: 6px;
+    color: var(--red);
+    display: block;
+    margin-bottom: 16px;
+    font-weight: 600;
+  }
+  .top-title {
+    font-size: 21px;
+    font-weight: 900;
+    line-height: 1.5;
+    color: var(--accent);
+    margin-bottom: 12px;
+    word-break: keep-all;
+  }
+  .top-sub {
+    font-size: 13px;
+    color: #777;
+    line-height: 1.9;
+    word-break: keep-all;
+  }
+
+  /* 체크리스트 */
+  .checklist-wrap {
+    padding: 32px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .checklist-label {
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: var(--red);
+    display: block;
+    margin-bottom: 20px;
+    font-weight: 600;
+  }
+
+  .check-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 16px;
+    border-bottom: 1px solid #111;
+    cursor: pointer;
+    transition: background 0.15s;
+    border-radius: 2px;
+  }
+  .check-item:last-child { border-bottom: none; }
+  .check-item:hover { background: #0d0d0d; }
+  .check-item.checked { background: #0d0508; }
+
+  .checkbox {
+    width: 22px;
+    height: 22px;
+    border: 1.5px solid #333;
+    border-radius: 2px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    background: #111;
+  }
+  .check-item.checked .checkbox {
+    background: var(--red);
+    border-color: var(--red);
+  }
+  .checkbox::after {
+    content: '';
+    width: 6px;
+    height: 10px;
+    border-right: 2px solid white;
+    border-bottom: 2px solid white;
+    transform: rotate(45deg) translate(-1px, -1px);
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  .check-item.checked .checkbox::after { opacity: 1; }
+
+  .check-text {
+    font-size: 15px;
+    color: #ccc;
+    line-height: 1.8;
+    word-break: keep-all;
+    flex: 1;
+    transition: color 0.15s;
+  }
+  .check-item.checked .check-text {
+    color: #ff4060;
+    font-weight: 600;
+  }
+
+  /* 카운터 */
+  .counter-bar {
+    margin: 20px 0 0;
+    background: #0c0c0c;
+    border: 1px solid #1e1e1e;
+    padding: 16px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .counter-label { font-size: 13px; color: #777; }
+  .counter-num {
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--red);
+    line-height: 1;
+  }
+  .counter-total { font-size: 13px; color: #444; }
+
+  /* 결과 */
+  .result-box {
+    margin: 20px 0 0;
+    padding: 22px 18px;
+    display: none;
+    border-left: 3px solid var(--red);
+    background: #0d0407;
+  }
+  .result-box.show { display: block; }
+  .result-grade {
+    font-size: 12px;
+    letter-spacing: 3px;
+    color: var(--red);
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 700;
+  }
+  .result-text {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1.7;
+    word-break: keep-all;
+  }
+  .result-sub {
+    font-size: 13px;
+    color: #888;
+    margin-top: 8px;
+    line-height: 1.8;
+    word-break: keep-all;
+  }
+  .result-teaser {
+    margin-top: 16px;
+    padding: 14px 16px;
+    background: #150508;
+    border: 1px dashed #e8102e;
+    font-size: 13px;
+    color: #ddd;
+    line-height: 1.9;
+    word-break: keep-all;
+    text-align: center;
+  }
+  .result-teaser strong { color: #e8102e; }
+
+  /* CTA 박스 */
+  .cta-wrap {
+    padding: 32px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .cta-title {
+    font-size: 18px;
+    font-weight: 900;
+    color: var(--accent);
+    line-height: 1.55;
+    margin-bottom: 8px;
+    word-break: keep-all;
+  }
+  .cta-sub {
+    font-size: 13px;
+    color: #777;
+    margin-bottom: 24px;
+    line-height: 1.9;
+    word-break: keep-all;
+  }
+
+  /* 이메일 폼 */
+  .email-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .email-input {
+    background: #0c0c0c;
+    border: 1px solid #2a2a2a;
+    color: var(--text);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 15px;
+    padding: 16px 18px;
+    outline: none;
+    width: 100%;
+    transition: border-color 0.2s;
+  }
+  .email-input:focus { border-color: var(--red); }
+  .email-input::placeholder { color: #444; }
+
+  .submit-btn {
+    background: var(--red);
+    color: white;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 16px;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    letter-spacing: 1px;
+    transition: background 0.2s;
+  }
+  .submit-btn:hover { background: #ff2040; }
+  .submit-btn:active { background: #c00020; }
+
+  .form-note {
+    font-size: 11px;
+    color: #444;
+    text-align: center;
+    line-height: 1.8;
+  }
+
+  /* 성공 메시지 */
+  .success-msg {
+    display: none;
+    text-align: center;
+    padding: 28px 20px;
+    background: #040d08;
+    border: 1px solid #1a3020;
+  }
+  .success-msg.show { display: block; }
+  .success-icon { font-size: 32px; margin-bottom: 12px; }
+  .success-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 8px;
+    word-break: keep-all;
+  }
+  .success-sub {
+    font-size: 13px;
+    color: #888;
+    line-height: 1.9;
+    word-break: keep-all;
+  }
+
+  /* 링크 섹션 */
+  .links-wrap {
+    padding: 32px 20px;
+  }
+  .links-label {
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: var(--muted);
+    display: block;
+    margin-bottom: 16px;
+    font-weight: 600;
+  }
+
+  .link-btn {
+    display: block;
+    padding: 18px 20px;
+    margin-bottom: 10px;
+    font-size: 15px;
+    font-weight: 700;
+    text-decoration: none;
+    text-align: center;
+    transition: all 0.2s;
+    word-break: keep-all;
+  }
+  .link-btn.primary {
+    background: var(--red);
+    color: white;
+  }
+  .link-btn.primary:hover { background: #ff2040; }
+  .link-btn.secondary {
+    background: #0c0c0c;
+    color: var(--accent);
+    border: 1px solid #2a2a2a;
+  }
+  .link-btn.secondary:hover { border-color: var(--red); }
+  .link-btn .btn-sub {
+    display: block;
+    font-size: 11px;
+    font-weight: 400;
+    opacity: 0.7;
+    margin-top: 3px;
+    letter-spacing: 0.5px;
+  }
+
+  /* 하단 */
+  .footer {
+    text-align: center;
+    padding: 20px;
+    font-size: 11px;
+    color: #333;
+  }
+</style>
+</head>
+<body>
+
+<!-- 상단 -->
+<div class="top-bar">
+  <span class="top-tag">🦊 I AM A VILLAIN</span>
+  <div class="top-title">지금 내가 을인지<br>확인하는 체크리스트</div>
+  <div class="top-sub">솔직하게 체크해봐.<br>결과 보면 진짜 놀랄 수도 있어. 🦊</div>
+</div>
+
+
+<!-- 체크리스트 -->
+<div class="checklist-wrap">
+  <span class="checklist-label">CHECK LIST</span>
+
+  <div class="check-item" onclick="toggleCheck(this)">
+    <div class="checkbox"></div>
+    <div class="check-text">🐻 연락은 항상 내가 먼저 한다</div>
+  </div>
+  <div class="check-item" onclick="toggleCheck(this)">
+    <div class="checkbox"></div>
+    <div class="check-text">🐻 읽씹 당하면 하루 기분이 통째로 망가진다</div>
+  </div>
+  <div class="check-item" onclick="toggleCheck(this)">
+    <div class="checkbox"></div>
+    <div class="check-text">🐻 남자 기분이 안 좋으면 내가 먼저 눈치 본다</div>
+  </div>
+  <div class="check-item" onclick="toggleCheck(this)">
+    <div class="checkbox"></div>
+    <div class="check-text">🐻 싫어도 싫다고 말하지 못한다</div>
+  </div>
+  <div class="check-item" onclick="toggleCheck(this)">
+    <div class="checkbox"></div>
+    <div class="check-text">🐻 만나자는 말을 내가 먼저 꺼내기 어렵다</div>
+  </div>
+  <div class="check-item" onclick="toggleCheck(this)">
+    <div class="checkbox"></div>
+    <div class="check-text">🐻 내 스케줄보다 남자 스케줄이 먼저다</div>
+  </div>
+  <div class="check-item" onclick="toggleCheck(this)">
+    <div class="checkbox"></div>
+    <div class="check-text">🐻 카톡 빨리 답장 안 하면 불안하다</div>
+  </div>
+  <div class="check-item" onclick="toggleCheck(this)">
+    <div class="checkbox"></div>
+    <div class="check-text">🐻 내가 더 좋아하는 것 같아서 불안하다</div>
+  </div>
+  <div class="check-item" onclick="toggleCheck(this)">
+    <div class="checkbox"></div>
+    <div class="check-text">🐻 남자가 화나면 내 잘못인지 먼저 생각한다</div>
+  </div>
+  <div class="check-item" onclick="toggleCheck(this)">
+    <div class="checkbox"></div>
+    <div class="check-text">🐻 연애에서 항상 내가 더 노력하는 것 같다</div>
+  </div>
+
+  <!-- 카운터 -->
+  <div class="counter-bar">
+    <span class="counter-label">🐻 곰 항목</span>
+    <div style="display:flex;align-items:baseline;gap:4px;">
+      <span class="counter-num" id="counter">0</span>
+      <span class="counter-total">/ 10</span>
+    </div>
+  </div>
+
+  <!-- 결과 -->
+  <div class="result-box" id="result-box">
+    <span class="result-grade" id="result-grade">결과</span>
+    <div class="result-text" id="result-text"></div>
+    <div class="result-sub" id="result-sub"></div>
+  </div>
+</div>
+
+
+<!-- 이메일 수집 CTA -->
+<div class="cta-wrap" id="email-section">
+  <div class="cta-title" id="cta-title">
+    🦊 자세한 결과 + 여우 변신법<br>이메일로 바로 보내줄게
+  </div>
+  <div class="cta-sub">
+    빌런 입문 가이드 + 을 탈출 첫 번째 ACTION<br>무료로 보내드려요 🦊
+  </div>
+
+  <div class="email-form" id="email-form">
+    <link rel="stylesheet" href="https://resource.stibee.com/subscribe/stb_subscribe_form_style.css">
+    <style>
+      /* 스티비 폼 스타일 오버라이드 */
+      #stb_subscribe { background: transparent !important; padding: 0 !important; }
+      #stb_subscribe_form { background: transparent !important; }
+      .stb_form_title { display: none !important; }
+      .stb_form_set_label { color: #888 !important; font-size: 13px !important; font-family: "Noto Sans KR", sans-serif !important; margin-bottom: 8px !important; }
+      .stb_form_set_input {
+        background: #0c0c0c !important;
+        border: 1px solid #2a2a2a !important;
+        color: #f0e8df !important;
+        font-family: "Noto Sans KR", sans-serif !important;
+        font-size: 15px !important;
+        padding: 16px 18px !important;
+        width: 100% !important;
+        border-radius: 0 !important;
+        outline: none !important;
+      }
+      .stb_form_set_input:focus { border-color: #e8102e !important; }
+      .stb_form_submit_button {
+        background: #e8102e !important;
+        color: white !important;
+        font-family: "Noto Sans KR", sans-serif !important;
+        font-size: 15px !important;
+        font-weight: 700 !important;
+        padding: 16px !important;
+        width: 100% !important;
+        border: none !important;
+        border-radius: 0 !important;
+        cursor: pointer !important;
+        letter-spacing: 1px !important;
+      }
+      .stb_form_policy { font-size: 12px !important; color: #555 !important; font-family: "Noto Sans KR", sans-serif !important; }
+      .stb_form_policy label { color: #555 !important; }
+      .stb_form_modal_open_btn { color: #888 !important; font-size: 12px !important; }
+      .stb_asterisk { color: #e8102e !important; }
+      .stb_form_set { margin-bottom: 12px !important; }
+    </style>
+    <div id="stb_subscribe">
+      <form action="https://stibee.com/api/v1.0/lists/1txat1PyP6zsOsxD1IqeR6md4_d2rA==/public/subscribers" method="POST" target="_blank" accept-charset="utf-8" class="stb_form" name="stb_subscribe_form" id="stb_subscribe_form" data-lang="" novalidate>
+        <fieldset class="stb_form_set">
+          <label for="stb_email" class="stb_form_set_label">
+            이메일 주소<span class="stb_asterisk">*</span>
+          </label>
+          <input type="text" class="stb_form_set_input" id="stb_email" name="email" required="required" placeholder="이메일 주소를 입력해주세요">
+          <div class="stb_form_msg_error" id="stb_email_error"></div>
+        </fieldset>
+        <div class="stb_form_policy">
+          <label>
+            <input type="checkbox" id="stb_policy" value="stb_policy_true">
+            <span>(필수)</span>
+            <button id="stb_form_modal_open" data-modal="stb_form_policy_modal" class="stb_form_modal_open_btn" type="button">개인정보 수집 및 이용</button>에 동의합니다.
+          </label>
+          <div class="stb_form_msg_error" id="stb_policy_error"></div>
+          <div class="stb_form_modal stb_form_policy_text blind" id="stb_form_policy_modal">
+            <div class="stb_form_modal_body">
+              <h1 class="stb_form_modal_title">개인정보 수집 및 이용</h1>
+              <div class="stb_form_modal_text">뉴스레터 발송을 위한 최소한의 개인정보를 수집하고 이용합니다. 수집된 정보는 발송 외 다른 목적으로 이용되지 않으며, 서비스가 종료되거나 구독을 해지할 경우 즉시 파기됩니다.</div>
+              <div class="stb_form_modal_btn">
+                <button id="stb_form_modal_close" class="stb_form_modal_close_btn" data-modal="stb_form_policy_modal" type="button">닫기</button>
+              </div>
+            </div>
+            <div class="stb_form_modal_bg" id="stb_form_modal_bg"></div>
+          </div>
+        </div>
+        <div class="stb_form_result" id="stb_form_result"></div>
+        <fieldset class="stb_form_set_submit">
+          <button type="submit" class="stb_form_submit_button" id="stb_form_submit_button">
+            🦊 무료로 받기 →
+          </button>
+        </fieldset>
+      </form>
+    </div>
+    <script type="text/javascript" src="https://resource.stibee.com/subscribe/stb_subscribe_form.js"></script>
+    <div style="font-size:11px;color:#444;text-align:center;margin-top:10px;">스팸 없어요. 언제든 구독 취소 가능해요.</div>
+  </div>
+</div>
+
+
+<!-- 링크 -->
+<div class="links-wrap">
+  <span class="links-label">NEXT STEP</span>
+
+  <a href="https://smartstore.naver.com/lovedowon/products/13433627294" class="link-btn primary">
+    📖 I AM A VILLAIN 전자책 보러가기
+    <span class="btn-sub">지금 49,000원 → 5월부터 59,000원</span>
+  </a>
+
+  <a href="https://www.instagram.com/nass_villian?igsh=enBpdDc0dnlqemdw" class="link-btn secondary">
+    📱 인스타 팔로우
+    <span class="btn-sub">@nass_villian — 매일 빌런 tip 올라와</span>
+  </a>
+
+  <a href="https://blog.naver.com/nass_billan" class="link-btn secondary">
+    📝 네이버 블로그
+    <span class="btn-sub">연애 팩폭 & 빌런 전략 무료로 읽기</span>
+  </a>
+</div>
+
+<div class="footer">
+  © I AM A VILLAIN by naynay 🦊
+</div>
+
+
+<script>
+  let checkedCount = 0;
+
+  function toggleCheck(item) {
+    item.classList.toggle('checked');
+    checkedCount = document.querySelectorAll('.check-item.checked').length;
+    document.getElementById('counter').textContent = checkedCount;
+    updateResult();
+  }
+
+  function updateResult() {
+    const box = document.getElementById('result-box');
+    const grade = document.getElementById('result-grade');
+    const text = document.getElementById('result-text');
+    const sub = document.getElementById('result-sub');
+    const ctaTitle = document.getElementById('cta-title');
+
+    if (checkedCount === 0) {
+      box.classList.remove('show');
+      return;
+    }
+
+    box.classList.add('show');
+
+    // 숫자에 따른 힌트만 보여줌
+    if (checkedCount >= 8) {
+      grade.textContent = '🐻 곰 항목 ' + checkedCount + '개';
+      text.textContent = '결과가 나왔어... 근데 직접 말하기 좀 그래 😅';
+      sub.textContent = '자세한 결과는 이메일로 보내줄게. 각오하고 열어봐.';
+      ctaTitle.innerHTML = '🦊 자세한 결과 + 여우 변신법<br>이메일로 바로 보내줄게';
+    } else if (checkedCount >= 5) {
+      grade.textContent = '🐻 곰 항목 ' + checkedCount + '개';
+      text.textContent = '애매한 결과가 나왔어. 여우야 곰이야?';
+      sub.textContent = '자세한 결과는 이메일로 보내줄게. 생각보다 놀랄 수 있어.';
+      ctaTitle.innerHTML = '🦊 정확한 결과 + 빌런 팁<br>이메일로 바로 보내줄게';
+    } else if (checkedCount >= 3) {
+      grade.textContent = '🦊 곰 항목 ' + checkedCount + '개';
+      text.textContent = '오 나쁘지 않은데? 근데 확인이 필요해.';
+      sub.textContent = '자세한 결과는 이메일로 보내줄게. 기대해도 좋아.';
+      ctaTitle.innerHTML = '🦊 결과 확인 + 더 강해지는 법<br>이메일로 바로 보내줄게';
+    } else {
+      grade.textContent = '🦊 곰 항목 ' + checkedCount + '개';
+      text.textContent = '결과 좋은 것 같은데? 확인해봐야 알아.';
+      sub.textContent = '자세한 결과는 이메일로 보내줄게 🦊';
+      ctaTitle.innerHTML = '🦊 결과 확인하러 가기<br>이메일로 바로 보내줄게';
+    }
+
+    // 이메일 섹션으로 부드럽게 스크롤
+    setTimeout(() => {
+      document.getElementById('email-section').scrollIntoView({ behavior: 'smooth' });
+    }, 800);
+  }
+
+
+</script>
+
+</body>
+</html>
